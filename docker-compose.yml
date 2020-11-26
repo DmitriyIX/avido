@@ -1,0 +1,44 @@
+# Пропишем версию
+version: '3.3'
+# Перечислим сервисы
+services:
+    nginx:
+        image: nginx:latest
+        container_name: nginx1
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - ./nginx/core:/etc/nginx/conf.d
+            - ./nginx/www:/var/www/
+            - ./nginx/Logs:/var/log/nginx/
+            - ./nginx/html:/usr/share/nginx/html/
+        links:
+            - php
+
+    php:
+        build: ./php
+        container_name: php-fpm1
+        volumes:
+            - ./nginx/www:/var/www
+            
+    mysql:
+        image: mysql:latest
+        ports:
+            - "3306:3306"
+        container_name: mysql1
+        environment:
+            - MYSQL_ROOT_PASSWORD=mypassword
+            - MYSQL_DATABASE=avido
+            - MYSQL_USER=useravido
+            - MYSQL_PASSWORD=secret
+        volumes:
+            - ./mysql:/var/lib/mysql
+            
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: phpmyadmin1
+        ports:
+            - 8090:80
+        links:
+            - mysql:db
